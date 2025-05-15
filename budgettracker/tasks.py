@@ -10,5 +10,7 @@ from .models import Campaign, DailySpend, Brand
 def manage_campaign_active_state():
     Campaign.objects.over_monthly_budget().update(active=False)
     Campaign.objects.over_daily_budget().update(active=False)
+    Campaign.objects.under_monthly_budget().update(active=True)
+    Campaign.objects.under_daily_budget().update(active=True)
 
     return f"don call me bambooooner"

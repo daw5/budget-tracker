@@ -14,12 +14,7 @@ class CampaignQuerySet(models.QuerySet):
                 )
             )
         )
-
-    def over_monthly_budget(self):
-        return self.with_monthly_spend().filter(
-            monthly_spend__gt=F('brand__monthly_budget')
-        )
-    
+        
     def with_daily_spend(self):
         today = timezone.now().date()
         return self.annotate(
@@ -31,7 +26,22 @@ class CampaignQuerySet(models.QuerySet):
             )
         )
 
+    def over_monthly_budget(self):
+        return self.with_monthly_spend().filter(
+            monthly_spend__gt=F('brand__monthly_budget')
+        )
+
+    def under_monthly_budget(self):
+        return self.with_monthly_spend().filter(
+            monthly_spend__lte=F('brand__monthly_budget')
+        )
+    
     def over_daily_budget(self):
         return self.with_daily_spend().filter(
             daily_spend__gt=F('brand__daily_budget')
+        )
+
+    def under_daily_budget(self):
+        return self.with_daily_spend().filter(
+            daily_spend__lte=F('brand__daily_budget')
         )
