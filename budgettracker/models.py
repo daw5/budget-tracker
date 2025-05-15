@@ -6,6 +6,9 @@ class Brand(models.Model):
     created_date = models.DateField(auto_now_add=True)
     monthly_budget = models.IntegerField(default = 0)
     daily_budget = models.IntegerField(default = 0)
+    
+    def __str__(self):
+        return self.name
 
 class Campaign(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
@@ -15,6 +18,9 @@ class Campaign(models.Model):
     start_hour = models.IntegerField(default = 0)
     end_hour = models.IntegerField(default = 0)
     objects = CampaignQuerySet.as_manager()
+    
+    def __str__(self):
+        return self.name
 
 class DailySpend(models.Model):
     Campaign = models.ForeignKey(
@@ -24,4 +30,7 @@ class DailySpend(models.Model):
     )
     created_date = models.DateField(auto_now_add=True)
     amount_spent = models.IntegerField(default = 0)
+    
+    def __str__(self):
+        return (f'{self.Campaign.name} spend for date {self.created_date}')
     

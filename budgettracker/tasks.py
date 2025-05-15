@@ -1,5 +1,9 @@
 from celery import shared_task
-from .models import Campaign, DailySpend, Brand
+from .models import Campaign
+from django.utils.timezone import now
+from django.db.models import Q, F
+
+current_hour = now().hour
 
 # 1. Creating a task which, once every minute, looks at each brand in the database and determines whether or not it is over budget or the day / month, and if so, set active = false for all of that brand’s campaigns
 # 2. Have another task, which, once every minute, checks each campaign to see if it is within the dayparting window or not. If not, and campaign is active, set to false. If it is inactive, and within dayparting window, set to true. 
@@ -13,4 +17,26 @@ def manage_campaign_active_state():
     Campaign.objects.under_monthly_budget().update(active=True)
     Campaign.objects.under_daily_budget().update(active=True)
 
-    return f"don call me bambooooner"
+    Campaign.objects.filter(
+        (
+            Q(start_hour__lte=F('end_hour')) &
+            Q(start_hour__lte=current_hour) &
+            Q(end_hour__gt=current_hour)
+        ) |
+        (
+            Q(start_hour__gt=F('end_hour')) &
+            (Q(start_hour__lte=current_hour) | Q(end_hour__gt=current_hour))
+        )
+    ).update(active=True)
+    
+    Campaign.objects.filter(
+        Q(start_hour__lte=F('end_hour')) & 
+            (Q(start_hour__gt=current_hour) | Q(end_hour__lte=current_hour)
+        ) |
+        Q(start_hour__gt=F('end_hour')) & 
+            (Q(start_hour__gt=current_hour) & Q(end_hour__lte=current_hour)
+        )
+    ).update(active=False)
+
+    return f'Managing active state for campaigns, current hour: {current_hour}'
+
