@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
         Campaign.objects.create(
             brand=coke,
-            name="Classic",
+            name="Classic Coke",
             start_hour=6,
             end_hour=20,
             active=True,
@@ -21,7 +21,7 @@ class Command(BaseCommand):
 
         Campaign.objects.create(
             brand=coke,
-            name="Diet",
+            name="Diet Coke",
             start_hour=0,
             end_hour=24,
             active=True,
@@ -29,7 +29,7 @@ class Command(BaseCommand):
 
         Campaign.objects.create(
             brand=pepsi,
-            name="Classic",
+            name="Classic Pepsi",
             start_hour=6,
             end_hour=18,
             active=True,
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
         Campaign.objects.create(
             brand=pepsi,
-            name="Diet",
+            name="Diet Pepsi",
             start_hour=6,
             end_hour=24,
             active=True,

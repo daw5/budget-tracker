@@ -1,7 +1,6 @@
 from django.urls import path
-
-from . import views
+from .views import create_or_update_daily_spend
 
 urlpatterns = [
-    path("", views.index, name="index"),
+    path('api/update-daily-spend/', create_or_update_daily_spend),
 ]

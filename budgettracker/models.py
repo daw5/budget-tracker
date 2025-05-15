@@ -1,7 +1,7 @@
 from django.db import models
 
 class Brand(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     created_date = models.DateField(auto_now_add=True)
     monthly_budget = models.IntegerField(default = 0)
     daily_budget = models.IntegerField(default = 0)
@@ -16,7 +16,7 @@ class Brand(models.Model):
 
     @property
     def total_daily_spend(self):
-        today = timezone.now().date().month
+        today = timezone.now().date()
         return self.campaigns.filter(
             created__day=today.day,
             created__month=today.month,
@@ -25,7 +25,7 @@ class Brand(models.Model):
 
 class Campaign(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
     created_date = models.DateField(auto_now_add=True)
     active = models.BooleanField()  
     start_hour = models.IntegerField(default = 0)
@@ -41,7 +41,7 @@ class Campaign(models.Model):
 
     @property
     def total_daily_spend(self):
-        today = timezone.now().date().month
+        today = timezone.now().date()
         return self.dailyspends.filter(
             created__day=today.day,
             created__month=today.month,
@@ -49,7 +49,7 @@ class Campaign(models.Model):
         ).aggregate(total=Sum('amount_spent'))['total'] or 0
 
 class DailySpend(models.Model):
-    Campaign = models.ForeignKey(Brand, on_delete=models.CASCADE)
+    Campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE)
     created_date = models.DateField(auto_now_add=True)
     amount_spent = models.IntegerField(default = 0)
     
