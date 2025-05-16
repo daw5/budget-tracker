@@ -5,19 +5,30 @@ from django.db.models import Q, F
 
 current_hour = now().hour
 
-# 1. Creating a task which, once every minute, looks at each brand in the database and determines whether or not it is over budget or the day / month, and if so, set active = false for all of that brand’s campaigns
-# 2. Have another task, which, once every minute, checks each campaign to see if it is within the dayparting window or not. If not, and campaign is active, set to false. If it is inactive, and within dayparting window, set to true. 
-# 3. These first two tasks can probably be one task calling two functions, since we are pulling the same data and writing to the same model. 
-# 4. Have a third task which only runs when the day turns over, and re activates the campaign if monthly budget is not yet exceeded and it is inactive (because it went over the day before, or the month before). 
+@shared_task
+def manage_campaign_active_status_for_daily_budget():
+    Campaign.objects.under_daily_budget().update(active=True)
+    Campaign.objects.over_daily_budget().update(active=False)
+
+    return f'Managing active state for campaigns based on daily budget, current hour: {current_hour}'
 
 @shared_task
-def manage_campaign_active_state():
+def manage_campaign_active_status_for_monthly_budget():
     Campaign.objects.over_monthly_budget().update(active=False)
-    Campaign.objects.over_daily_budget().update(active=False)
     Campaign.objects.under_monthly_budget().update(active=True)
-    Campaign.objects.under_daily_budget().update(active=True)
+    
+    return f'Managing active state for campaigns based on monthly budget, current hour: {current_hour}'
+    
+@shared_task
+def manage_campaign_active_status_for_dayparting_window():
+    reactivate_inactive_campaigns_within_allowed_window()
+    deactivate_active_campaigns_outside_of_allowed_window()
+    
+    return f'Managing active state for campaigns based on dayparting window, current hour: {current_hour}'
 
+def reactivate_inactive_campaigns_within_allowed_window():
     Campaign.objects.filter(
+        Q(active=False) &
         (
             Q(start_hour__lte=F('end_hour')) &
             Q(start_hour__lte=current_hour) &
@@ -29,7 +40,9 @@ def manage_campaign_active_state():
         )
     ).update(active=True)
     
+def deactivate_active_campaigns_outside_of_allowed_window():
     Campaign.objects.filter(
+        Q(active=True) &
         Q(start_hour__lte=F('end_hour')) & 
             (Q(start_hour__gt=current_hour) | Q(end_hour__lte=current_hour)
         ) |
@@ -37,6 +50,4 @@ def manage_campaign_active_state():
             (Q(start_hour__gt=current_hour) & Q(end_hour__lte=current_hour)
         )
     ).update(active=False)
-
-    return f'Managing active state for campaigns, current hour: {current_hour}'
-
+    
