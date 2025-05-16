@@ -24,4 +24,4 @@ I was initially going to go with multiple tasks, as the challenge description se
 
 ##### Daily/monthly resets
 
-I am always looking for the most simple and elegant solution that meets requirements, while being iterable, so there is room to expand if the business requests it. Because of the design path I have chosen, there is no need to reset the daily / monthly budget. When the day / month rolls over, my queries will take into account that it is a new day / month, and not include any daily spends from previous months when calculating if we are over budget or not.
+I am always looking for the most simple and elegant solution that ensures required functionality, while being iterable, so there is room to expand if the business requests it. Because of the design path I have chosen, there is no need to reset the daily / monthly budget. When the day / month rolls over, my queries will take into account that it is a new day / month, and not include any daily spends from previous months when calculating if we are over budget or not.
