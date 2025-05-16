@@ -3,31 +3,26 @@ from .models import Campaign
 from django.utils.timezone import now
 from django.db.models import Q, F
 
-current_hour = now().hour
-
 @shared_task
-def manage_campaign_active_status_for_daily_budget():
-    Campaign.objects.under_daily_budget().update(active=True)
+def manage_campaign_active_state():
+    current_hour = now().hour
+    reactivate_campaign_if_possible(current_hour)
+    deactivate_campaign_if_necessary(current_hour)
+    
+    return f'Managing active state for campaigns; current hour: {current_hour}'
+
+def reactivate_campaign_if_possible(current_hour):
+    Campaign.objects.filter(within_dayparting_window(current_hour)) \
+        .under_all_budgets() \
+        .update(active=True)
+
+def deactivate_campaign_if_necessary(current_hour):
     Campaign.objects.over_daily_budget().update(active=False)
-
-    return f'Managing active state for campaigns based on daily budget, current hour: {current_hour}'
-
-@shared_task
-def manage_campaign_active_status_for_monthly_budget():
     Campaign.objects.over_monthly_budget().update(active=False)
-    Campaign.objects.under_monthly_budget().update(active=True)
+    Campaign.objects.filter(outside_of_dayparting_window(current_hour)).update(active=False)
     
-    return f'Managing active state for campaigns based on monthly budget, current hour: {current_hour}'
-    
-@shared_task
-def manage_campaign_active_status_for_dayparting_window():
-    reactivate_inactive_campaigns_within_allowed_window()
-    deactivate_active_campaigns_outside_of_allowed_window()
-    
-    return f'Managing active state for campaigns based on dayparting window, current hour: {current_hour}'
-
-def reactivate_inactive_campaigns_within_allowed_window():
-    Campaign.objects.filter(
+def within_dayparting_window(current_hour):
+    return (
         Q(active=False) &
         (
             Q(start_hour__lte=F('end_hour')) &
@@ -38,10 +33,10 @@ def reactivate_inactive_campaigns_within_allowed_window():
             Q(start_hour__gt=F('end_hour')) &
             (Q(start_hour__lte=current_hour) | Q(end_hour__gt=current_hour))
         )
-    ).update(active=True)
+    )
     
-def deactivate_active_campaigns_outside_of_allowed_window():
-    Campaign.objects.filter(
+def outside_of_dayparting_window(current_hour):
+    return (
         Q(active=True) &
         Q(start_hour__lte=F('end_hour')) & 
             (Q(start_hour__gt=current_hour) | Q(end_hour__lte=current_hour)
@@ -49,5 +44,5 @@ def deactivate_active_campaigns_outside_of_allowed_window():
         Q(start_hour__gt=F('end_hour')) & 
             (Q(start_hour__gt=current_hour) & Q(end_hour__lte=current_hour)
         )
-    ).update(active=False)
+    )
     

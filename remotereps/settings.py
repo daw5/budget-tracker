@@ -126,16 +126,8 @@ CELERY_BROKER_URL = 'redis://redis:6379/0'
 CELERY_RESULT_BACKEND = 'redis://redis:6379/0'
 
 CELERY_BEAT_SCHEDULE = {
-     'run-every-minute': {
-        'task': 'budgettracker.tasks.manage_campaign_active_status_for_dayparting_window',
-        'schedule': 60.0,
-    },
-    'run-every-15-seconds': {
-        'task': 'budgettracker.tasks.manage_campaign_active_status_for_monthly_budget',
-         'schedule': 15.0,
-    },
      'run-every-10-seconds': {
-        'task': 'budgettracker.tasks.manage_campaign_active_status_for_daily_budget',
+        'task': 'budgettracker.tasks.manage_campaign_active_state',
         'schedule': 10.0,
     },
 }
