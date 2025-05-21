@@ -11,7 +11,7 @@ From the root of this repository, run the following commands:
 ```
 docker compose build
 docker compose up -d
-docker-compose run app python manage.py createsuperuser
+docker-compose exec app python manage.py createsuperuser
 ```
 
 Follow the prompts to finish creating your user (we will need these credentials in order to access the django admin panel)
@@ -42,8 +42,8 @@ Feel free to play around with adjusting parameters manually in the django admin 
 
 Note: I am using django-stubs to infer types from models, which is why I have not explicitly typed them.
 
-Run the below command from the root of the project in order to perform static type checking:
+Run the below command in order to perform static type checking:
 
 ```
-mypy .
+docker-compose exec app mypy .
 ```
