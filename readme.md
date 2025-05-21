@@ -40,6 +40,8 @@ Feel free to play around with adjusting parameters manually in the django admin 
 
 ## Type Checking
 
+Note: I am using django-stubs to infer types from models, which is why I have not explicitly typed them.
+
 Run the below command from the root of the project in order to perform static type checking:
 
 ```

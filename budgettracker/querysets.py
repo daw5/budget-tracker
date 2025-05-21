@@ -1,3 +1,4 @@
+from datetime import date
 from django.db.models import Sum, F, Q, Value
 from django.db.models.functions import Coalesce
 from django.utils import timezone
@@ -5,7 +6,7 @@ from .models import models
 
 class CampaignQuerySet(models.QuerySet):
     def with_monthly_spend(self):
-        today = timezone.now().date()
+        today: date = timezone.now().date()
         return self.annotate(
             monthly_spend=Sum(
                 'dailyspends__amount_spent',
@@ -17,7 +18,7 @@ class CampaignQuerySet(models.QuerySet):
         )
         
     def with_daily_spend(self):
-        today = timezone.now().date()
+        today: date = timezone.now().date()
         return self.annotate(
             daily_spend=Sum(
                 'dailyspends__amount_spent',
@@ -28,7 +29,7 @@ class CampaignQuerySet(models.QuerySet):
         )
         
     def with_spends(self):
-        today = timezone.now().date()
+        today: date = timezone.now().date()
         return self.annotate(
             daily_spend=Coalesce(
                 Sum(

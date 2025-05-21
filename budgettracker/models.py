@@ -8,7 +8,7 @@ class Brand(models.Model):
     monthly_budget = models.IntegerField(default = 0)
     daily_budget = models.IntegerField(default = 0)
     
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 class Campaign(models.Model):
@@ -20,7 +20,7 @@ class Campaign(models.Model):
     end_hour = models.IntegerField(default = 0)
     objects = CampaignQuerySet.as_manager()
     
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 class DailySpend(models.Model):
@@ -32,7 +32,7 @@ class DailySpend(models.Model):
     created_date = models.DateField(default=timezone.now)
     amount_spent = models.IntegerField(default = 0)
     
-    def __str__(self):
+    def __str__(self) -> str:
         return (f'{self.campaign.name} spend for date {self.created_date}')
     
     class Meta:
