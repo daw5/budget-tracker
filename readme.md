@@ -37,3 +37,11 @@ This buys one dollar's worth of ads for the 'Classic Coke' campaign. Returned wi
 To test that Celery is keeping everything within Coke's budget, try adding a larger amount. I have defaulted Coke's daily budget to 1000, and the Celery task which adjusts a campaign's active state based on daily budget runs every 10 seconds. Add an amount which exceeds Coke's daily budget and within 10 seconds, the campaign will have been deactivated, and no more money can be spent!
 
 Feel free to play around with adjusting parameters manually in the django admin panel, and watch how Celery reacts to active / deactivate campaigns!
+
+## Type Checking
+
+Run the below command from the root of the project in order to perform static type checking:
+
+```
+mypy .
+```
