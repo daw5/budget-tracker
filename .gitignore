@@ -8,3 +8,6 @@ media
 
 # Celery
 celerybeat-schedule*
+
+# Mac
+.DS_Store
